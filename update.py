@@ -7,33 +7,31 @@ Download and install the latest version of ChEMBL.
 momo.sander@googlemail.com
 """                                                  
 
-def updateChEMBL(release, user, pword, host, port): 
+def updateChEMBL(RELEASE, OPT_FILE): 
   import os
   import sys
   
 
   # On Mac...
-  #os.system("ftp ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(release, release)) 
+  #os.system("ftp ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE)) 
   # On Linux...
-  os.system("wget ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(release, release))
-  os.system("tar -zxvf chembl_%s_mysql.tar.gz" % release)
-  os.system("mysqladmin -u%s -p%s -h%s -P%s create chembl_%s" %(user, pword, host, port, release))    
-  os.system("mysql -u%s -p%s -h%s -P%s chembl_%s < chembl_%s_mysql/chembl_%s.mysqldump.sql" % ( user, pword, host, port, release, release, release))
+  os.system("wget ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE))
+  os.system("tar -zxvf chembl_%s_mysql.tar.gz" % RELEASE)
+  os.system("mysqladmin --defaults-extra-file=%s DROP IF EXISTS chembl_%s" %(OPT_FILE, RELEASE))    
+  os.system("mysqladmin --defaults-extra-file=%s CREATE chembl_%s" %(OPT_FILE, RELEASE))    
+  os.system("mysql --defaults-extra-file=%s chembl_%s < chembl_%s_mysql/chembl_%s.mysqldump.sql" % ( OPT_FILE, RELEASE, RELEASE, RELEASE))
 
                                   	                                                     
 if __name__ == '__main__':
   import sys                                        
   import os
-  if len(sys.argv) != 6:                  
-    print "specify release, user, pword, host, port"
+  if len(sys.argv) != 3:                  
+    print "specify RELEASE, OPT_FILE"
     sys.exit()                                                                             
                                         
-  release = str(sys.argv[1])
-  user = str(sys.argv[2])
-  pword = str(sys.argv[3])
-  host = str(sys.argv[4])
-  port = str(sys.argv[5])
+  RELEASE = str(sys.argv[1])
+  OPT_FILE = str(sys.argv[2])
 
-  updateChEMBL(release, user, pword, host, port)
+  updateChEMBL(RELEASE, OPT_FILE)
 
                                              
