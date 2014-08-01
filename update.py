@@ -16,7 +16,7 @@ def updateChEMBL(RELEASE, OPT_FILE):
     # On Linux...
     if not os.path.isfile("chembl_%s_mysql/chembl_%s.mysqldump.sql" % (RELEASE, RELEASE)):
         rt = call(["wget", "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE)], stdout=PIPE)
-        print("Downloaded ChEMBL, return code is " + rt)
+        print("Downloaded ChEMBL, return code is " + str(rt))
         rt = call(["tar", "-zxvf", "chembl_%s_mysql.tar.gz" % RELEASE])
     rt = call(["mysql", "--defaults-extra-file=%s"%OPT_FILE, "-e", "DROP DATABASE IF EXISTS chembl_%s" %RELEASE])    
     rt = call(["mysql", "--defaults-extra-file=%s"%OPT_FILE, "-e", "CREATE DATABASE chembl_%s"%RELEASE])    
