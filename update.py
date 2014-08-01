@@ -8,18 +8,19 @@ momo.sander@googlemail.com
 """                                                  
 
 def updateChEMBL(RELEASE, OPT_FILE): 
-  import os
-  import sys
-  
-
-  # On Mac...
-  #os.system("ftp ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE)) 
-  # On Linux...
-  os.system("wget ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE))
-  os.system("tar -zxvf chembl_%s_mysql.tar.gz" % RELEASE)
-  os.system("mysqladmin --defaults-extra-file=%s DROP IF EXISTS chembl_%s" %(OPT_FILE, RELEASE))    
-  os.system("mysqladmin --defaults-extra-file=%s CREATE chembl_%s" %(OPT_FILE, RELEASE))    
-  os.system("mysql --defaults-extra-file=%s chembl_%s < chembl_%s_mysql/chembl_%s.mysqldump.sql" % ( OPT_FILE, RELEASE, RELEASE, RELEASE))
+    import os
+    from subprocess import (call, Popen, PIPE)
+    
+    # On Mac...
+    #os.system("ftp ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE)) 
+    # On Linux...
+    if not os.path.isfile("chembl_%s_mysql/chembl_%s.mysqldump.sql" % (RELEASE, RELEASE)):
+        rt = call(["wget", "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_%s/chembl_%s_mysql.tar.gz" %(RELEASE, RELEASE)], stdout=PIPE)
+        print("Downloaded ChEMBL, return code is " + rt)
+        rt = call(["tar", "-zxvf", "chembl_%s_mysql.tar.gz" % RELEASE])
+    rt = call(["mysql", "--defaults-extra-file=%s"%OPT_FILE, "-e", "DROP DATABASE IF EXISTS chembl_%s" %RELEASE])    
+    rt = call(["mysql", "--defaults-extra-file=%s"%OPT_FILE, "-e", "CREATE DATABASE chembl_%s"%RELEASE])    
+    rt = call("mysql --defaults-extra-file=%s chembl_%s < chembl_%s_mysql/chembl_%s.mysqldump.sql" % (OPT_FILE, RELEASE, RELEASE, RELEASE), shell = True)
 
                                   	                                                     
 if __name__ == '__main__':
